@@ -25,7 +25,6 @@ import Clutter from 'gi://Clutter';
 import Utils from './utils/utils.js';
 import Config from './config.js';
 
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 declare const global: any;
 
@@ -189,12 +188,9 @@ export default GObject.registerClass(
         updateBars(values: { color: number; value: number }[][]) {
             if(!this.get_stage() || !this.get_parent()) return;
 
-            if(this.header) {
-                const componentMonitor = Main.layoutManager.findMonitorForActor(this);
-                if(componentMonitor && componentMonitor.inFullscreen) {
-                    return;
-                }
-            }
+            // The panel can remain visible over a fullscreen window. Only
+            // suppress updates when this header actor is actually hidden.
+            if(this.header && !this.mapped) return;
 
             try {
                 let [width, height] = this.get_size();
